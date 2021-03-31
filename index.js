@@ -22,7 +22,7 @@ function getLocalExports(input) {
     statement =>
       ts.isExpressionStatement(statement) &&
       ts.isBinaryExpression(statement.expression) &&
-      statement.expression.left.getFullText(input).endsWith('exports.locals') &&
+      statement.expression.left.getFullText(input).endsWith('___CSS_LOADER_EXPORT___.locals') &&
       ts.isObjectLiteralExpression(statement.expression.right)
   )
 
@@ -68,7 +68,7 @@ function createCSSDefinition(tokens) {
 /**
  * The loader
  */
-module.exports = async function(content) {
+module.exports = async function (content) {
   this.cacheable(true)
 
   const url = loaderUtils.interpolateName(this, '[path][name].[ext]', {
@@ -100,9 +100,12 @@ module.exports = async function(content) {
       ...prettierConfig,
       parser: 'typescript'
     })
-    fs.writeFile(url + '.d.ts', '/* eslint-disable */\n// this is an auto-generated file\n' + result, () => {
-      callback(null, content)
-    })
+    await fs.promise.writeFile(
+      url + '.d.ts',
+      '/* eslint-disable */\n// this is an auto-generated file\n' + result,
+      'utf8'
+    )
+    callback(null, content)
   } else {
     callback(null, content)
   }
