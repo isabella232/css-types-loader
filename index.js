@@ -78,35 +78,38 @@ module.exports = async function (content) {
   const options = loaderUtils.getOptions(this)
   const callback = this.async()
 
-  if (!prettierConfig) {
-    prettierConfig = await prettier.resolveConfig(options.prettierConfig || __dirname)
-  }
+  try {
+    if (!prettierConfig) {
+      prettierConfig = await prettier.resolveConfig(options.prettierConfig || __dirname)
+    }
 
-  const input = ts.createSourceFile(
-    url + '.ts',
-    content,
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ false,
-    ts.ScriptKind.JS
-  )
-
-  const localExports = getLocalExports(input)
-
-  if (localExports.length > 0) {
-    const outputAST = createCSSDefinition(localExports)
-    input.statements = outputAST
-    let result = printer.printFile(input)
-    result = prettier.format(result, {
-      ...prettierConfig,
-      parser: 'typescript'
-    })
-    await fs.promise.writeFile(
-      url + '.d.ts',
-      '/* eslint-disable */\n// this is an auto-generated file\n' + result,
-      'utf8'
+    const input = ts.createSourceFile(
+      url + '.ts',
+      content,
+      ts.ScriptTarget.Latest,
+      /* setParentNodes */ false,
+      ts.ScriptKind.JS
     )
+
+    const localExports = getLocalExports(input)
+
+    if (localExports.length > 0) {
+      const outputAST = createCSSDefinition(localExports)
+      input.statements = outputAST
+      let result = printer.printFile(input)
+      result = prettier.format(result, {
+        ...prettierConfig,
+        parser: 'typescript'
+      })
+      await fs.promises.writeFile(
+        url + '.d.ts',
+        '/* eslint-disable */\n// this is an auto-generated file\n' + result,
+        'utf8'
+      )
+    }
+
     callback(null, content)
-  } else {
-    callback(null, content)
+  } catch (e) {
+    callback(e, content)
   }
 }
