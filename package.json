@@ -1,6 +1,6 @@
 {
   "name": "@wings-software/css-types-loader",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Webpack loader for generating type-definitions for css modules",
   "main": "index.js",
   "repository": "git@github.com:wings-software/css-types-loader.git",

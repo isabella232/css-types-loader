@@ -27,7 +27,7 @@ function getLocalExports(input) {
   )
 
   if (locals && locals.expression.right) {
-    return locals.expression.right.properties.map(property => property.name.text)
+    return locals.expression.right.properties.map(property => property.name.text).sort()
   }
 
   return []
