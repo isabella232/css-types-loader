@@ -20,6 +20,7 @@ const printer = ts.createPrinter({
 })
 
 let prettierConfig
+let licenseTemplate
 
 /**
  * Finds `export.locals` in the tree and extracts the keys
@@ -90,6 +91,13 @@ module.exports = async function (content) {
       prettierConfig = await prettier.resolveConfig(options.prettierConfig || __dirname)
     }
 
+    if (!licenseTemplate) {
+      licenseTemplate = await fs.promises.readFile(
+        path.resolve(__dirname, './scripts/license/.license-header-polyform-shield.txt'),
+        'utf8'
+      )
+    }
+
     const input = ts.createSourceFile(
       url + '.ts',
       content,
@@ -110,7 +118,12 @@ module.exports = async function (content) {
       })
       await fs.promises.writeFile(
         url + '.d.ts',
-        '/* eslint-disable */\n// this is an auto-generated file\n' + result,
+        `/* eslint-disable */
+/**
+ * ${licenseTemplate.replace('<YEAR>', '2021').split('\n').join('\n * ')}
+ **/
+// this is an auto-generated file, do not update this manually
+${result}`,
         'utf8'
       )
     }
