@@ -22,6 +22,9 @@
     "typescript": "^4.3.5"
   },
   "lint-staged": {
+    "*": [
+      "sh scripts/license/stamp.sh"
+    ],
     "*.js": [
       "prettier --check"
     ]
